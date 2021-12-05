@@ -6,30 +6,29 @@
 
 import pandas as pd
 import os
-import numpy as np
 
 
 def feature_data_import(district_name:str,
-                        feature_name: str,
-                        data_version: str):
-    """Imports feature data for a particular district based on input variables.
+                        data_version: str,
+                        feature_name: str = None):
+    """Imports data for a particular district based on input variables.
 
         Args:
-            district_name: Name of district in Tamil Nadu, India among the available 9 districts
-            feature_name: Name of feature among the list of 9 features
+            district_name: Name of district in Tamil Nadu, India among the available 29 districts
             data_version: Version of the data to be imported
+            feature_name: Name of feature among the list of 9 features
 
         Returns:
-            Pandas Dataframe contains feature's data for 102 years from 1900 - 2002.
+            Pandas dataframe for the particular district
     """
     if '.csv' not in feature_name:
         feature_name += '.csv'
-    feature_location = '{}/{}/{}/{}'.format('../data', data_version, district_name, feature_name, 'csv')
+    feature_location = '{}/{}/{}/{}'.format('../data', data_version, district_name, feature_name)
     district_feature_data = pd.read_csv(feature_location, sep='\t')
     return district_feature_data
 
 
-def column_name_preprocessing(column_name: str):
+def column_name_processing(column_name: str):
     """Cleans the input string by lowering the case, replacing spaces with underscores, and removing extensions.
 
         Args:
@@ -46,16 +45,17 @@ def column_name_preprocessing(column_name: str):
 
 def feature_transformation(district_name: str,
                            feature_name: str):
-    """Converts the 2D dataframe of a district's feature into a sequential list
+    """Imports the district's feature datafrome and transforms it into a sequential list
 
         Args:
-            district_name: Name of district in Tamil Nadu, India
+            district_name: Name of district in Tamil Nadu, India among the available 29 districts
             feature_name: Name of feature among the list of 9 features
 
         Returns:
             Sequential of list of the data for a district's feature
     """
-    original_feature_data = district_feature_data_import(district_name, feature_name, 'original_data')
+    feature_data_location = '{}/{}/{}'.format('../data/original_data', district_name, feature_name)
+    original_feature_data = pd.read_csv(feature_data_location, sep='\t')
     transformed_feature_data = list()
     for i in range(len(original_feature_data)):
         transformed_feature_data.extend(list(original_feature_data.iloc[i][1:]))
@@ -64,8 +64,7 @@ def feature_transformation(district_name: str,
 
 
 def data_transformation(district_name: str,
-                        features: list,
-                        processed_features: list):
+                        features: list):
     """
 
         Args:
@@ -73,17 +72,15 @@ def data_transformation(district_name: str,
             features: List containing
     """
     combined_data = dict()
-    for i in range(len())
+    feature_transformation(district_name, features[0])
+    #for i in range(len())
 
 
 def data_preprocessing():
     district_names = os.listdir('../data/original_data')
     district_names.sort()
     features = os.listdir('{}/{}/'.format('../data/original_data', district_names[0]))
-    district_names_processed = column_name_preprocessing(district_names)
-    features_processed = column_name_preprocessing(features)
-    print(features_processed)
-    print(features)
+    data_transformation(district_names[0], features)
 
 
 def main():
