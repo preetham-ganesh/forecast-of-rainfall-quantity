@@ -63,17 +63,30 @@ def feature_transformation(district_name: str,
     return transformed_feature_data
 
 
-def data_transformation(district_name: str,
-                        features: list):
-    """
+def min_max_normalization(feature_values: list):
+    """Performs min-max normalization on the given list of values
 
         Args:
-            district_name: Name of a district in Tamil Nadu, India
-            features: List containing
+            feature_values: Sequential list of floating point values for the district's feature data
+
+        Returns:
+            Sequential list of min-max normalized values for the district's feature data
     """
-    combined_data = dict()
-    feature_transformation(district_name, features[0])
-    #for i in range(len())
+    min_feature_value = min(feature_values)
+    max_feature_value = max(feature_values)
+    return [(feature_values[i] - min_feature_value) / (max_feature_value - min_feature_value) for i in
+            range(len(feature_values))]
+
+
+def data_transformation(district_name: str,
+                        features: list):
+    combined_data, combined_min_max_data = dict(), dict()
+    for i in range(len(features)):
+        transformed_feature_data = feature_transformation(district_name, features[i])
+        min_max_feature_data = min_max_normalization(transformed_feature_data)
+        print(min_max_feature_data)
+        combined_data[column_name_processing(features[i])] = transformed_feature_data
+    #combined_dataframe
 
 
 def data_preprocessing():
