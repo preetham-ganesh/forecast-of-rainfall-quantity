@@ -9,13 +9,13 @@ import os
 import numpy as np
 
 
-def district_feature_data_import(district_name:str,
-                                 feature_name: str,
-                                 data_version: str):
+def feature_data_import(district_name:str,
+                        feature_name: str,
+                        data_version: str):
     """Imports feature data for a particular district based on input variables.
 
         Args:
-            district_name: Name of district in Tamil Nadu, India
+            district_name: Name of district in Tamil Nadu, India among the available 9 districts
             feature_name: Name of feature among the list of 9 features
             data_version: Version of the data to be imported
 
@@ -29,23 +29,19 @@ def district_feature_data_import(district_name:str,
     return district_feature_data
 
 
-def column_name_preprocessing(column_names: list):
-    """Cleans the list of features/districts by lowering the case, replacing spaces with underscores, and removing
-    .csv extensions.
+def column_name_preprocessing(column_name: str):
+    """Cleans the input string by lowering the case, replacing spaces with underscores, and removing extensions.
 
         Args:
-            column_names: List of features/districts
+            column_name: String to be cleaned
 
         Returns:
-            List of processed features/districts
+            Processed string
     """
-    new_column_names = []
-    for i in range(len(column_names)):
-        column_name = column_names[i].lower()
-        column_name = column_name.replace('.csv', '')
-        column_name = '_'.join(column_name.split(' '))
-        new_column_names.append(column_name)
-    return new_column_names
+    new_column_name = column_name.lower()
+    new_column_name = new_column_name.replace('.csv', '')
+    new_column_name = '_'.join(new_column_name.split(' '))
+    return new_column_name
 
 
 def feature_transformation(district_name: str,
@@ -59,17 +55,35 @@ def feature_transformation(district_name: str,
         Returns:
             Sequential of list of the data for a district's feature
     """
-    district_feature_data = district_feature_data_import(district_name, feature_name, 'original_data')
+    original_feature_data = district_feature_data_import(district_name, feature_name, 'original_data')
+    transformed_feature_data = list()
+    for i in range(len(original_feature_data)):
+        transformed_feature_data.extend(list(original_feature_data.iloc[i][1:]))
+    transformed_feature_data = [round(transformed_feature_data[i], 3) for i in range(len(transformed_feature_data))]
+    return transformed_feature_data
+
+
+def data_transformation(district_name: str,
+                        features: list,
+                        processed_features: list):
+    """
+
+        Args:
+            district_name: Name of a district in Tamil Nadu, India
+            features: List containing
+    """
+    combined_data = dict()
+    for i in range(len())
 
 
 def data_preprocessing():
     district_names = os.listdir('../data/original_data')
     district_names.sort()
     features = os.listdir('{}/{}/'.format('../data/original_data', district_names[0]))
-    district_data = district_feature_data_import(district_names[0], features[0], 'original_data')
-    print(district_data.head())
     district_names_processed = column_name_preprocessing(district_names)
     features_processed = column_name_preprocessing(features)
+    print(features_processed)
+    print(features)
 
 
 def main():
