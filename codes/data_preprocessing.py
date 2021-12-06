@@ -28,6 +28,27 @@ def feature_data_import(district_name:str,
     return district_feature_data
 
 
+def district_data_export(district_name: str,
+                         data_version: str,
+                         data: pd.DataFrame):
+    """Exports the dataframe into a CSV format to the mentioned data_version folder. If the folder does not exist, then
+    the folder is created.
+
+        Args:
+            district_name: Name of district in Tamil Nadu, India among the available 29 districts
+            data_version: Version of the data to be imported
+            data: Combined data for a district
+
+        Returns:
+            None
+    """
+    directory_path = '{}/{}'.format('../data', data_version)
+    if not os.path.isdir(directory_path):
+        os.mkdir(directory_path)
+    file_path = '{}/{}.csv'.format(directory_path, district_name)
+    data.to_csv(file_path, index=False)
+
+
 def column_name_processing(column_name: str):
     """Cleans the input string by lowering the case, replacing spaces with underscores, and removing extensions.
 
@@ -81,12 +102,18 @@ def min_max_normalization(feature_values: list):
 def data_transformation(district_name: str,
                         features: list):
     combined_data, combined_min_max_data = dict(), dict()
+    processed_district_name = column_name_processing(district_name)
+    processed_features = []
     for i in range(len(features)):
+        processed_feature = column_name_processing(features[i])
         transformed_feature_data = feature_transformation(district_name, features[i])
         min_max_feature_data = min_max_normalization(transformed_feature_data)
-        print(min_max_feature_data)
-        combined_data[column_name_processing(features[i])] = transformed_feature_data
-    #combined_dataframe
+        combined_data[processed_feature] = transformed_feature_data
+        combined_min_max_data[processed_feature] = min_max_feature_data
+        processed_features.append(processed_feature)
+    combined_dataframe = pd.DataFrame(combined_data, columns=processed_features)
+    combined_min_max_dataframe = pd.DataFrame(combined_min_max_data, columns=processed_features)
+    district_data_export(processed_district_name, 'combined_data', combined_dataframe)
 
 
 def data_preprocessing():
