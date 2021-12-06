@@ -107,12 +107,24 @@ def data_transformation(district_name: str,
     district_data_export(processed_district_name, 'min_max_normalized_data', combined_min_max_dataframe)
 
 
-def main():
+def data_preprocessing():
+    """Performs data preprocessing on all the districts data in Tamil Nadu, India.
+
+        Args:
+            None
+
+        Returns:
+            None
+    """
     district_names = os.listdir('../data/original_data')
     district_names.sort()
     features = os.listdir('{}/{}/'.format('../data/original_data', district_names[0]))
     for i in range(len(district_names)):
         data_transformation(district_names[i], features)
+
+
+def main():
+    data_preprocessing()
 
 
 if __name__ == '__main__':
