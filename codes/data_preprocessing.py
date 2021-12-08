@@ -1,6 +1,6 @@
 # author_name = 'Preetham Ganesh'
 # project_title = 'Forecast of Rainfall Quantity and its Variation using Environmental Features'
-# email = 'preetham.ganesh2021@gmail.com'
+# email = 'preetham.ganesh2015@gmail.com'
 # doi = 'https://ieeexplore.ieee.org/document/8960026'
 
 
