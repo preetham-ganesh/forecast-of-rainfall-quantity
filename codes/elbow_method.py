@@ -48,6 +48,7 @@ def data_preprocessing(combined_dataframe: pd.DataFrame):
         Args:
             combined_dataframe: Pandas dataframe containing the combined data from all the 29 districts in Tamil Nadu,
                                 India
+
         Returns:
             combined_min_max_dataframe: Min-max normalized Pandas dataframe containing the combined data from all the
                                         29 districts in Tamil Nadu, India
@@ -89,15 +90,26 @@ def compute_district_feature_median(combined_min_max_dataframe: pd.DataFrame,
 
 
 def elbow_method(combined_min_max_median_dataframe: pd.DataFrame):
+    """Performs elbow method analysis by fitting K-means clustering model on the input for different no. of centers and
+    plotting a graph which shows no. of centers vs sum of squared distances.
+
+        Args:
+            combined_min_max_median_dataframe: Pandas DataFrame containing District-wise median for all the features
+
+        Returns:
+            None
+    """
     sum_of_squares = list()
     combined_min_max_median_dataframe = combined_min_max_median_dataframe.drop(columns=['district'])
-    for i in range(1, 10):
-        print(i)
+    k_values = list(range(2, 29))
+    for i in k_values:
         k_means_model = KMeans(n_clusters=i)
         k_means_model.fit(combined_min_max_median_dataframe)
         sum_of_squares.append(k_means_model.inertia_)
-    print(sum_of_squares)
-    plt.plot(list(range(1, 10)), sum_of_squares, 'bx-')
+    plt.plot(k_values, sum_of_squares, 'bx-')
+    plt.xlabel('Centers')
+    plt.ylabel('Sum of Squared Distances')
+    plt.savefig('../results/elbow_method_analysis.png')
     plt.show()
 
 
