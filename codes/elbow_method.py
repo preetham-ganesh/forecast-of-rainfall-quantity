@@ -47,7 +47,7 @@ def data_combine(district_names: list):
         combined_dataframe = combined_dataframe.append(district_data)
         processed_district_names.append(current_district_name)
 
-    # Export the combined dataframe into a CSV file
+    # Export the combined_dataframe into a CSV file
     district_data_export('all_districts', 'combined_data', combined_dataframe)
     return combined_dataframe, processed_district_names
 
@@ -64,13 +64,19 @@ def data_preprocessing(combined_dataframe: pd.DataFrame):
                                         29 districts in Tamil Nadu, India
             features: Modified list of features for available for every district in Tamil Nadu, India
     """
+    # Creating an empty dataframe for the min_max normalized features
     features = list(combined_dataframe.columns)
     combined_min_max_dataframe = pd.DataFrame(columns=features)
-    combined_min_max_dataframe['district'] = combined_dataframe['district']
-    if 'district' in features:
-        features.remove('district')
+
+    # Iteratively perform min_max normalization on all the features in the combined_dataframe
     for i in range(len(features)):
-        combined_min_max_dataframe[features[i]] = min_max_normalization(list(combined_dataframe[features[i]]))
+        # Since, 'district' feature does not contain numerical values, its copied to the new dataframe
+        if features[i] == 'district':
+            combined_min_max_dataframe['district'] = combined_dataframe['district']
+        else:
+            combined_min_max_dataframe[features[i]] = min_max_normalization(list(combined_dataframe[features[i]]))
+
+    # Export the combined_min_max_dataframe into a CSV file
     district_data_export('all_districts', 'min_max_normalized_data', combined_dataframe)
     return combined_min_max_dataframe, features
 
