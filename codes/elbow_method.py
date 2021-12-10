@@ -26,18 +26,28 @@ def data_combine(district_names: list):
             processed_district_names: Processed list of district_names
     """
     directory_path = '../data/combined_data'
+
+    # In case if the code was already executed, the combined data will be stored in a CSV file called 'all_districts',
+    # since that is not an actual district in Tamil Nadu, India, the file_name is removed from the list
     if 'all_districts.csv' in district_names:
         district_names.remove('all_districts.csv')
+
+    # Reading the first district's data into the combined_dataframe, adding a new column to the dataframe 'district',
+    # which contains the current district's processed name
     combined_dataframe = pd.read_csv('{}/{}'.format(directory_path, district_names[0]))
     current_district_name = column_name_processing(district_names[0])
     combined_dataframe['district'] = list([current_district_name for i in range(len(combined_dataframe))])
     processed_district_names = [current_district_name]
+
+    # Performs the above process iteratively on all the available district names
     for i in range(1, len(district_names)):
         district_data = pd.read_csv('{}/{}'.format(directory_path, district_names[i]))
         current_district_name = column_name_processing(district_names[i])
         district_data['district'] = list([current_district_name for _ in range(len(district_data))])
         combined_dataframe = combined_dataframe.append(district_data)
         processed_district_names.append(current_district_name)
+
+    # Export the combined dataframe into a CSV file
     district_data_export('all_districts', 'combined_data', combined_dataframe)
     return combined_dataframe, processed_district_names
 
