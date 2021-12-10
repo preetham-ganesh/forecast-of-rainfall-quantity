@@ -77,7 +77,7 @@ def data_preprocessing(combined_dataframe: pd.DataFrame):
             combined_min_max_dataframe[features[i]] = min_max_normalization(list(combined_dataframe[features[i]]))
 
     # Export the combined_min_max_dataframe into a CSV file
-    district_data_export('all_districts', 'min_max_normalized_data', combined_dataframe)
+    district_data_export('all_districts', 'min_max_normalized_data', combined_min_max_dataframe)
     return combined_min_max_dataframe, features
 
 
