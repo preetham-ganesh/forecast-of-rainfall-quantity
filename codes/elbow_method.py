@@ -122,12 +122,18 @@ def elbow_method(combined_min_max_median_dataframe: pd.DataFrame):
             None
     """
     sum_of_squares = list()
+
+    # 'district' column is removed from the dataframe as its not a numerical column, but a filtration column
     combined_min_max_median_dataframe = combined_min_max_median_dataframe.drop(columns=['district'])
     k_values = list(range(2, 29))
+
+    # Iterate across the k_values, train the k-means model using the dataset, and calculate the sum_of_squares
     for i in k_values:
         k_means_model = KMeans(n_clusters=i)
         k_means_model.fit(combined_min_max_median_dataframe)
         sum_of_squares.append(k_means_model.inertia_)
+
+    # Generate plot for no. of centers vs sum of squared distances
     plt.plot(k_values, sum_of_squares, 'bx-')
     plt.xlabel('Centers')
     plt.ylabel('Sum of Squared Distances')
