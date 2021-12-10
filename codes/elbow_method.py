@@ -62,7 +62,7 @@ def data_preprocessing(combined_dataframe: pd.DataFrame):
         Returns:
             combined_min_max_dataframe: Min-max normalized Pandas dataframe containing the combined data from all the
                                         29 districts in Tamil Nadu, India
-            features: Modified list of features for available for every district in Tamil Nadu, India
+            features: List of features for available for every district in Tamil Nadu, India
     """
     # Creating an empty dataframe for the min_max normalized features
     features = list(combined_dataframe.columns)
@@ -72,7 +72,7 @@ def data_preprocessing(combined_dataframe: pd.DataFrame):
     for i in range(len(features)):
         # Since, 'district' feature does not contain numerical values, its copied to the new dataframe
         if features[i] == 'district':
-            combined_min_max_dataframe['district'] = combined_dataframe['district']
+            combined_min_max_dataframe[features[i]] = list(combined_dataframe['district'])
         else:
             combined_min_max_dataframe[features[i]] = min_max_normalization(list(combined_dataframe[features[i]]))
 
@@ -104,7 +104,8 @@ def compute_district_feature_median(combined_min_max_dataframe: pd.DataFrame,
         combined_min_max_median_data['district'].append(district_names[i])
         district_min_max_data = combined_min_max_dataframe[combined_min_max_dataframe['district'] == district_names[i]]
         for j in range(len(features)):
-            combined_min_max_median_data[features[j]].append(np.median(district_min_max_data[features[j]]))
+            if features[j] != 'district':
+                combined_min_max_median_data[features[j]].append(np.median(district_min_max_data[features[j]]))
 
     # Convert the dictionary into a Dataframe
     combined_min_max_median_dataframe = pd.DataFrame(combined_min_max_median_data, columns=['district'] + features)
