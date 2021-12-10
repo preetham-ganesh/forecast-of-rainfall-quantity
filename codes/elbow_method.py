@@ -95,12 +95,18 @@ def compute_district_feature_median(combined_min_max_dataframe: pd.DataFrame,
         Returns:
             Pandas DataFrame containing District-wise median for all the features
     """
+    # Created an empty dictionary for the median computation, where the keys would be features from the
+    # combined_min_max_dataframe, and the values would be an empty list
     combined_min_max_median_data = {i: list() for i in list(combined_min_max_dataframe.columns)}
+
+    # Iteratively calculate the median for all the features, district by district
     for i in range(len(district_names)):
         combined_min_max_median_data['district'].append(district_names[i])
         district_min_max_data = combined_min_max_dataframe[combined_min_max_dataframe['district'] == district_names[i]]
         for j in range(len(features)):
             combined_min_max_median_data[features[j]].append(np.median(district_min_max_data[features[j]]))
+
+    # Convert the dictionary into a Dataframe
     combined_min_max_median_dataframe = pd.DataFrame(combined_min_max_median_data, columns=['district'] + features)
     return combined_min_max_median_dataframe
 
