@@ -1,6 +1,6 @@
-# author_name = 'Preetham Ganesh'
+# authors_name = 'Preetham Ganesh, Harsha Vardhini Vasu'
 # project_title = 'Forecast of Rainfall Quantity and its Variation using Environmental Features'
-# email = 'preetham.ganesh2015@gmail.com'
+# email = 'preetham.ganesh2015@gmail.com, harshavardhini2019@gmail.com'
 # doi = 'https://ieeexplore.ieee.org/document/8960026'
 
 
@@ -52,16 +52,20 @@ def data_combine(district_names: list):
     return combined_dataframe, processed_district_names
 
 
-def data_preprocessing(combined_dataframe: pd.DataFrame):
+def data_min_max_preprocessing(combined_dataframe: pd.DataFrame,
+                               dataframe_name: str,
+                               dataframe_version: str):
     """Performs min-max normalization on the combined dataframe for all the features individually.
 
         Args:
-            combined_dataframe: Pandas dataframe containing the combined data from all the 29 districts in Tamil Nadu,
-                                India
+            combined_dataframe: Pandas dataframe containing the combined data from all the 29 districts or the specific
+                                districts in a cluster, from Tamil Nadu, India
+            dataframe_name: Name of the file used to save the combined_dataframe
+            dataframe_version: Location where the data has to be exported
 
         Returns:
             combined_min_max_dataframe: Min-max normalized Pandas dataframe containing the combined data from all the
-                                        29 districts in Tamil Nadu, India
+                                        29 districts or the specific districts in a cluster, from Tamil Nadu, India
             features: List of features for available for every district in Tamil Nadu, India
     """
     # Creating an empty dataframe for the min_max normalized features
@@ -77,7 +81,7 @@ def data_preprocessing(combined_dataframe: pd.DataFrame):
             combined_min_max_dataframe[features[i]] = min_max_normalization(list(combined_dataframe[features[i]]))
 
     # Export the combined_min_max_dataframe into a CSV file
-    district_data_export('all_districts', 'min_max_normalized_data', combined_min_max_dataframe)
+    district_data_export(dataframe_name, dataframe_version, combined_min_max_dataframe)
     return combined_min_max_dataframe, features
 
 
@@ -108,7 +112,7 @@ def compute_district_feature_median(combined_min_max_dataframe: pd.DataFrame,
                 combined_min_max_median_data[features[j]].append(np.median(district_min_max_data[features[j]]))
 
     # Convert the dictionary into a Dataframe
-    combined_min_max_median_dataframe = pd.DataFrame(combined_min_max_median_data, columns=['district'] + features)
+    combined_min_max_median_dataframe = pd.DataFrame(combined_min_max_median_data, columns=features)
     return combined_min_max_median_dataframe
 
 
@@ -146,7 +150,8 @@ def main():
     district_names = os.listdir('../data/combined_data')
     district_names.sort()
     combined_dataframe, district_names = data_combine(district_names)
-    combined_min_max_dataframe, features = data_preprocessing(combined_dataframe)
+    combined_min_max_dataframe, features = data_min_max_preprocessing(combined_dataframe, 'all_districts',
+                                                                      'min_max_normalized_data')
     combined_min_max_median_dataframe = compute_district_feature_median(combined_min_max_dataframe, district_names,
                                                                         features)
     elbow_method(combined_min_max_median_dataframe)
