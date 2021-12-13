@@ -1,6 +1,6 @@
-# author_name = 'Preetham Ganesh'
+# authors_name = 'Preetham Ganesh, Harsha Vardhini Vasu'
 # project_title = 'Forecast of Rainfall Quantity and its Variation using Environmental Features'
-# email = 'preetham.ganesh2015@gmail.com'
+# email = 'preetham.ganesh2015@gmail.com, harshavardhini2019@gmail.com'
 # doi = 'https://ieeexplore.ieee.org/document/8960026'
 
 
@@ -17,6 +17,7 @@ def column_name_processing(column_name: str):
         Returns:
             Processed string
     """
+    # Converts 'The Nilgiris.csv' to 'the_nilgiris'
     new_column_name = column_name.lower()
     new_column_name = new_column_name.replace('.csv', '')
     new_column_name = '_'.join(new_column_name.split(' '))
@@ -36,6 +37,8 @@ def feature_transformation(district_name: str,
     """
     feature_data_location = '{}/{}/{}'.format('../data/original_data', district_name, feature_name)
     original_feature_data = pd.read_csv(feature_data_location, sep='\t')
+
+    # Iterates across the years 1901 - 2002, which appends a list 12 values to the newly created list
     transformed_feature_data = list()
     for i in range(len(original_feature_data)):
         transformed_feature_data.extend(list(original_feature_data.iloc[i][1:]))
@@ -66,7 +69,7 @@ def district_data_export(district_name: str,
 
         Args:
             district_name: Name of district in Tamil Nadu, India among the available 29 districts
-            data_version: Version of the data to be imported
+            data_version: Location where the data has to be exported
             data: Combined data for a district
 
         Returns:
@@ -94,6 +97,8 @@ def data_transformation(district_name: str,
     combined_data, combined_min_max_data = dict(), dict()
     processed_district_name = column_name_processing(district_name)
     processed_features = []
+
+    # Iterates across features and performs data transformation for each feature in the corresponding district
     for i in range(len(features)):
         processed_feature = column_name_processing(features[i])
         transformed_feature_data = feature_transformation(district_name, features[i])
@@ -101,6 +106,8 @@ def data_transformation(district_name: str,
         combined_data[processed_feature] = transformed_feature_data
         combined_min_max_data[processed_feature] = min_max_feature_data
         processed_features.append(processed_feature)
+
+    # Saves the transformed, combined and min_max_normalized dataframes into CSV files.
     combined_dataframe = pd.DataFrame(combined_data, columns=processed_features)
     combined_min_max_dataframe = pd.DataFrame(combined_min_max_data, columns=processed_features)
     district_data_export(processed_district_name, 'combined_data', combined_dataframe)
@@ -119,6 +126,8 @@ def data_preprocessing():
     district_names = os.listdir('../data/original_data')
     district_names.sort()
     features = os.listdir('{}/{}/'.format('../data/original_data', district_names[0]))
+
+    # Iterates across districts in Tamil Nadu, India to perform the data transformation
     for i in range(len(district_names)):
         data_transformation(district_names[i], features)
 
