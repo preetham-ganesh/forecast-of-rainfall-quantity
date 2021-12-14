@@ -55,14 +55,32 @@ def district_cluster_identification(district_names: list,
 
 def cluster_based_data_combine(cluster_district_dataframe: pd.DataFrame,
                                n_clusters: int):
+    """Uses cluster_district_dataframe to filter data from the combined_dataframe
+
+        Args:
+            cluster_district_dataframe: A dataframe containing the list of districts in Tamil Nadu, India, and the
+                                        clusters they belong to.
+            n_clusters: No. of clusters that should be used to train the K-Means clustering model.
+
+        Returns:
+            None
+    """
     directory_path = '../data/combined_data'
     combined_dataframe = pd.read_csv('{}/{}.csv'.format(directory_path, 'all_districts'))
+
+    # Iterates across the no. of clusters to perform filtration on the combined_dataframe
     for i in range(n_clusters):
         per_cluster_district_dataframe = cluster_district_dataframe[cluster_district_dataframe['cluster'] == i]
+
+        # Filters district's data for the current cluster
         per_cluster_combined_dataframe = combined_dataframe[combined_dataframe['district'].isin(
             list(per_cluster_district_dataframe['district']))]
         current_cluster_name = '{}_{}'.format('cluster', str(i))
+
+        # Saves current cluster's dataframe into a CSV file
         district_data_export(current_cluster_name, 'combined_data', per_cluster_combined_dataframe)
+
+        # Converts current cluster's dataframe into a min-max normalized dataframe and saves into a CSV file
         per_cluster_combined_min_max_dataframe, _ = data_min_max_preprocessing(per_cluster_combined_dataframe,
                                                                                current_cluster_name,
                                                                                'min_max_normalized_data')
