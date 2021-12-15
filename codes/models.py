@@ -21,6 +21,11 @@ def polynomial_feature_transformation(train_district_data_input: pd.DataFrame,
     return 0, 0
 
 
+def rmse_score(actual_values: np.ndarray,
+               predicted_values: np.ndarray):
+    return (mse_score(actual_values, predicted_values)) ** 0.5
+
+
 def model_training_testing(train_district_data_input: np.ndarray,
                            train_district_data_target: np.ndarray,
                            test_district_data_input: np.ndarray,
@@ -34,7 +39,8 @@ def model_training_testing(train_district_data_input: np.ndarray,
     else:
         model = 0
     model.fit(train_district_data_input, train_district_data_target)
-
+    train_district_data_predict = model.predict(train_district_data_input)
+    test_district_data_predict = model.predict(test_district_data_input)
 
 
 def per_district_model_training_testing(district_name: str,
