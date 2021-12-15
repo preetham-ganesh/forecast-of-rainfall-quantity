@@ -40,6 +40,15 @@ def rmse_score(actual_values: np.ndarray,
 
 def calculate_metrics(actual_values: np.ndarray,
                       predicted_values: np.ndarray):
+    """Using actual_values, predicted_values calculates metrics such as MSE, RMSE, MAE, MDAE, EVS, and R2 scores.
+
+        Args:
+            actual_values: Actual rainfall values in the dataset
+            predicted_values: Rainfall values predicted by the currently trained model
+
+        Returns:
+            Dictionary contains keys as score names and values as scores which are floating point values.
+    """
     return {'mse_score': mse_score(actual_values, predicted_values),
             'rmse_score': rmse_score(actual_values, predicted_values),
             'mae_score': mae_score(actual_values, predicted_values),
