@@ -13,11 +13,28 @@ from sklearn.metrics import explained_variance_score as evs_score
 from sklearn.metrics import r2_score
 from sklearn.model_selection import RepeatedKFold
 import os
+import numpy as np
 
 
 def polynomial_feature_transformation(train_district_data_input: pd.DataFrame,
                                       test_district_data_input: pd.DataFrame):
     return 0, 0
+
+
+def model_training_testing(train_district_data_input: np.ndarray,
+                           train_district_data_target: np.ndarray,
+                           test_district_data_input: np.ndarray,
+                           test_district_data_target: np.ndarray,
+                           chosen_model_name: str,
+                           parameter: int):
+    if chosen_model_name == 'polynomial_regression':
+        model = 0
+    elif chosen_model_name == 'decision_tree_regression':
+        model = DecisionTreeRegressor(max_depth=parameter)
+    else:
+        model = 0
+    model.fit(train_district_data_input, train_district_data_target)
+
 
 
 def per_district_model_training_testing(district_name: str,
@@ -28,13 +45,17 @@ def per_district_model_training_testing(district_name: str,
     for train_index, test_index in repeated_kfold.split(district_data):
         train_district_data = district_data.iloc[train_index]
         test_district_data = district_data.iloc[test_index]
-        train_district_data_input = train_district_data.drop(columns=['district', 'rainfall'])
-        train_district_data_target = train_district_data['rainfall']
-        test_district_data_input = test_district_data.drop(columns=['district', 'rainfall'])
-        test_district_data_target = test_district_data['rainfall']
+        train_district_data_input = np.array(train_district_data.drop(columns=['district', 'rainfall']))
+        train_district_data_target = np.array(train_district_data['rainfall'])
+        test_district_data_input = np.array(test_district_data.drop(columns=['district', 'rainfall']))
+        test_district_data_target = np.array(test_district_data['rainfall'])
         if chosen_model_name == 'polynomial_regression':
             train_district_data_input, test_district_data_input = polynomial_feature_transformation(
                 train_district_data_input, test_district_data_input)
+        print(train_district_data_input.shape)
+        print(train_district_data_target.shape)
+        print(type(train_district_data_input))
+        break
 
 
 def retrieve_hyperparameters(chosen_model_name: str):
