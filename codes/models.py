@@ -14,6 +14,7 @@ from sklearn.metrics import r2_score
 from sklearn.model_selection import RepeatedKFold
 import os
 import numpy as np
+from sklearn.utils import shuffle
 
 
 def polynomial_feature_transformation(train_district_data_input: pd.DataFrame,
@@ -23,6 +24,17 @@ def polynomial_feature_transformation(train_district_data_input: pd.DataFrame,
 
 def rmse_score(actual_values: np.ndarray,
                predicted_values: np.ndarray):
+    """Calculates Root Mean Squared Error based on the actual_values and predicted_values for the currently trained
+    model.
+
+        Args:
+            actual_values: Actual rainfall values in the dataset
+            predicted_values: Rainfall values predicted by the currently trained model
+
+        Returns:
+            Floating point value containing RMSE value calculated using the given input
+    """
+    # rmse_score = mse_score ** 0.5
     return (mse_score(actual_values, predicted_values)) ** 0.5
 
 
@@ -51,6 +63,20 @@ def model_training_testing(train_district_data_input: np.ndarray,
     model.fit(train_district_data_input, train_district_data_target)
     train_district_data_predict = model.predict(train_district_data_input)
     test_district_data_predict = model.predict(test_district_data_input)
+    train_metrics = calculate_metrics(train_district_data_target, train_district_data_predict)
+    test_metrics = calculate_metrics(test_district_data_target, test_district_data_predict)
+    return train_metrics, test_metrics
+
+
+def calculate_metrics_mean_repeated_kfold(parameters_metrics: pd.DataFrame,
+                                          repeated_kfold_metrics: pd.DataFrame,
+                                          parameter: int):
+    metrics_name = list(repeated_kfold_metrics.columns)
+    repeated_kfold_metrics_mean = {metrics_name[i]: np.mean(repeated_kfold_metrics[metrics_name[i]]) for i in range(
+        len(metrics_name))}
+    repeated_kfold_metrics_mean['parameters'] = parameter
+    parameters_metrics = parameters_metrics.append(repeated_kfold_metrics_mean, ignore_index=True)
+    return parameters_metrics
 
 
 def per_district_model_training_testing(district_name: str,
@@ -58,20 +84,33 @@ def per_district_model_training_testing(district_name: str,
                                         chosen_model_name: str):
     district_data = pd.read_csv('{}/{}'.format('../data/min_max_normalized_data', district_name))
     repeated_kfold = RepeatedKFold(n_repeats=10, n_splits=10)
-    for train_index, test_index in repeated_kfold.split(district_data):
-        train_district_data = district_data.iloc[train_index]
-        test_district_data = district_data.iloc[test_index]
-        train_district_data_input = np.array(train_district_data.drop(columns=['district', 'rainfall']))
-        train_district_data_target = np.array(train_district_data['rainfall'])
-        test_district_data_input = np.array(test_district_data.drop(columns=['district', 'rainfall']))
-        test_district_data_target = np.array(test_district_data['rainfall'])
-        if chosen_model_name == 'polynomial_regression':
-            train_district_data_input, test_district_data_input = polynomial_feature_transformation(
-                train_district_data_input, test_district_data_input)
-        print(train_district_data_input.shape)
-        print(train_district_data_target.shape)
-        print(type(train_district_data_input))
-        break
+    district_data = shuffle(district_data)
+    metrics_features = ['mse_score', 'rmse_score', 'mae_score', 'mdae_score', 'evs_score', 'r2_score']
+    train_parameters_metrics = pd.DataFrame(columns=['parameters'] + metrics_features)
+    test_parameters_metrics = pd.DataFrame(columns=['parameters'] + metrics_features)
+    for i in range(len(parameters)):
+        train_repeated_kfold_metrics = pd.DataFrame(columns=metrics_features)
+        test_repeated_kfold_metrics = pd.DataFrame(columns=metrics_features)
+        for train_index, test_index in repeated_kfold.split(district_data):
+            train_district_data = district_data.iloc[train_index]
+            test_district_data = district_data.iloc[test_index]
+            train_district_data_input = np.array(train_district_data.drop(columns=['district', 'rainfall']))
+            train_district_data_target = np.array(train_district_data['rainfall'])
+            test_district_data_input = np.array(test_district_data.drop(columns=['district', 'rainfall']))
+            test_district_data_target = np.array(test_district_data['rainfall'])
+            if chosen_model_name == 'polynomial_regression':
+                train_district_data_input, test_district_data_input = polynomial_feature_transformation(
+                    train_district_data_input, test_district_data_input)
+            train_metrics, test_metrics = model_training_testing(train_district_data_input, train_district_data_target,
+                                                                 test_district_data_input, test_district_data_target,
+                                                                 chosen_model_name, parameters[i])
+            train_repeated_kfold_metrics = train_repeated_kfold_metrics.append(train_metrics, ignore_index=True)
+            test_repeated_kfold_metrics = test_repeated_kfold_metrics.append(test_metrics, ignore_index=True)
+        train_parameters_metrics = calculate_metrics_mean_repeated_kfold(train_parameters_metrics,
+                                                                         train_repeated_kfold_metrics, parameters[i])
+        test_parameters_metrics = calculate_metrics_mean_repeated_kfold(test_parameters_metrics,
+                                                                        test_repeated_kfold_metrics, parameters[i])
+    print(train_parameters_metrics.head())
 
 
 def retrieve_hyperparameters(chosen_model_name: str):
