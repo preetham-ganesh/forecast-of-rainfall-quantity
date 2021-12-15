@@ -26,6 +26,16 @@ def rmse_score(actual_values: np.ndarray,
     return (mse_score(actual_values, predicted_values)) ** 0.5
 
 
+def calculate_metrics(actual_values: np.ndarray,
+                      predicted_values: np.ndarray):
+    return {'mse_score': mse_score(actual_values, predicted_values),
+            'rmse_score': rmse_score(actual_values, predicted_values),
+            'mae_score': mae_score(actual_values, predicted_values),
+            'mdae_score': mdae_score(actual_values, predicted_values),
+            'evs_score': evs_score(actual_values, predicted_values),
+            'r2_score': r2_score(actual_values, predicted_values)}
+
+
 def model_training_testing(train_district_data_input: np.ndarray,
                            train_district_data_target: np.ndarray,
                            test_district_data_input: np.ndarray,
