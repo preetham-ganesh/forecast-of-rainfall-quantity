@@ -6,6 +6,8 @@
 
 import pandas as pd
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.svm import SVR
 from sklearn.metrics import mean_squared_error as mse_score
 from sklearn.metrics import mean_absolute_error as mae_score
 from sklearn.metrics import median_absolute_error as mdae_score
@@ -18,7 +20,8 @@ from sklearn.utils import shuffle
 
 
 def polynomial_feature_transformation(train_district_data_input: pd.DataFrame,
-                                      test_district_data_input: pd.DataFrame):
+                                      test_district_data_input: pd.DataFrame,
+                                      parameter: int):
     return 0, 0
 
 
@@ -61,20 +64,48 @@ def model_training_testing(train_district_data_input: np.ndarray,
                            train_district_data_target: np.ndarray,
                            test_district_data_input: np.ndarray,
                            test_district_data_target: np.ndarray,
-                           chosen_model_name: str,
+                           current_model_name: str,
                            parameter: int):
-    if chosen_model_name == 'polynomial_regression':
-        model = 0
-    elif chosen_model_name == 'decision_tree_regression':
+    """Creates an object for the model using the input and performs training and testing of the models using the given
+    training and testing datasets.
+
+        Args:
+            train_district_data_input: Input training data for the district
+            train_district_data_target: Target training data for the district
+            test_district_data_input: Input testing data for the district
+            test_district_data_target: Target testing data for the district
+            current_model_name: Name of the model currently expected to be trained
+            parameter: Hyperparameter value for optimizing the regression model
+
+        Returns:
+            List containing metrics for the training and testing dataset computed using the currently trained model
+    """
+    # Based on the current_model_name the scikit-learn object is initialized using the hyperparameter (if necessary)
+    if current_model_name == 'polynomial_regression' or current_model_name == 'linear_regression':
+        model = LinearRegression()
+
+        # if current_model_name is polynomial_regression then the training_input and testing_input should be transformed
+        # based on the hyperparameter which is the number of degrees
+        if current_model_name == 'polynomial_regression':
+            train_district_data_input, test_district_data_input = polynomial_feature_transformation(
+                train_district_data_input, test_district_data_input, parameter)
+
+    elif current_model_name == 'decision_tree_regression':
         model = DecisionTreeRegressor(max_depth=parameter)
     else:
-        model = 0
+        model = SVR(kernel=parameter)
+
+    # Train the object created for the model using the training input and target
     model.fit(train_district_data_input, train_district_data_target)
+
+    # Using the trained model, predict the rainfall values for the training and testing inputs
     train_district_data_predict = model.predict(train_district_data_input)
     test_district_data_predict = model.predict(test_district_data_input)
+
+    # Calculate the metrics for the predicted rainfall values for the training and testing inputs
     train_metrics = calculate_metrics(train_district_data_target, train_district_data_predict)
     test_metrics = calculate_metrics(test_district_data_target, test_district_data_predict)
-    return train_metrics, test_metrics
+    return [train_metrics, test_metrics]
 
 
 def calculate_metrics_mean_repeated_kfold(parameters_metrics: pd.DataFrame,
