@@ -21,7 +21,7 @@ from sklearn.utils import shuffle
 
 def polynomial_feature_transformation(train_district_data_input: pd.DataFrame,
                                       test_district_data_input: pd.DataFrame,
-                                      parameter: int):
+                                      parameter: str):
     return 0, 0
 
 
@@ -65,7 +65,7 @@ def model_training_testing(train_district_data_input: np.ndarray,
                            test_district_data_input: np.ndarray,
                            test_district_data_target: np.ndarray,
                            current_model_name: str,
-                           parameter: int):
+                           parameter: str):
     """Creates an object for the model using the input and performs training and testing of the models using the given
     training and testing datasets.
 
@@ -91,9 +91,9 @@ def model_training_testing(train_district_data_input: np.ndarray,
                 train_district_data_input, test_district_data_input, parameter)
 
     elif current_model_name == 'decision_tree_regression':
-        model = DecisionTreeRegressor(max_depth=parameter)
+        model = DecisionTreeRegressor(max_depth=int(parameter))
     else:
-        model = SVR(kernel=parameter)
+        model = SVR(kernel=int(parameter))
 
     # Train the object created for the model using the training input and target
     model.fit(train_district_data_input, train_district_data_target)
@@ -110,7 +110,8 @@ def model_training_testing(train_district_data_input: np.ndarray,
 
 def calculate_metrics_mean_repeated_kfold(parameters_metrics: pd.DataFrame,
                                           repeated_kfold_metrics: pd.DataFrame,
-                                          parameter: int,
+                                          current_model_name: str,
+                                          parameter: str,
                                           metrics_features: list):
     """Calculate the mean of the metrics computed in every iteration of Repeated K-fold Cross Validation
 
@@ -118,6 +119,7 @@ def calculate_metrics_mean_repeated_kfold(parameters_metrics: pd.DataFrame,
             parameters_metrics: A dataframe containing the mean of all the metrics for all the hyperparameters
             repeated_kfold_metrics: A dataframe containing the metrics for all the iterations in the Repeated K-fold
                                     Cross Validation
+            current_model_name: Name of the model currently trained
             parameter: Current hyperparameter used for optimizing the regression model
             metrics_features: List containing the acronyms of the metrics used for evaluating the trained models
 
@@ -129,6 +131,7 @@ def calculate_metrics_mean_repeated_kfold(parameters_metrics: pd.DataFrame,
     repeated_kfold_metrics_mean = {metrics_features[i]: np.mean(repeated_kfold_metrics[metrics_features[i]]) for i in
                                    range(len(metrics_features))}
     repeated_kfold_metrics_mean['parameters'] = parameter
+    repeated_kfold_metrics_mean['model_names'] = current_model_name
 
     # Append the current hyperparameter's mean of metrics to the parameters_metrics
     parameters_metrics = parameters_metrics.append(repeated_kfold_metrics_mean, ignore_index=True)
@@ -158,8 +161,43 @@ def retrieve_hyperparameters(current_model_name: str):
 
     # For multiple_linear_regression, none of the hyperparameters are tuned.
     else:
-        parameters = [None]
+        parameters = ['None']
     return parameters
+
+
+def split_data_input_target(district_data: pd.DataFrame):
+    """Splits district_data into input and target datasets by filtering / selecting certain columns
+
+        Args:
+            district_data: Training / Testing dataset used to split / filter certain columns
+
+        Returns:
+            A tuple containing 2 numpy ndarrays containing the input and target datasets
+    """
+    district_data_input = district_data.drop(columns=['district', 'rainfall'])
+    district_data_target = district_data['rainfall']
+    return np.array(district_data_input), np.array(district_data_target)
+
+
+def district_results_export(district_name: str,
+                            data_split: str,
+                            metrics_dataframe: pd.DataFrame):
+    """Exports the metrics_dataframe into a CSV format to the mentioned data_version folder. If the folder does not
+    exist, then the folder is created.
+
+        Args:
+            district_name: Name of district in Tamil Nadu, India among the available 29 districts
+            data_split: Location where the metrics has to be exported
+            metrics_dataframe: Metrics dataframe
+
+        Returns:
+            None
+    """
+    directory_path = '{}/{}'.format('../data', data_version)
+    if not os.path.isdir(directory_path):
+        os.mkdir(directory_path)
+    file_path = '{}/{}.csv'.format(directory_path, district_name)
+    data.to_csv(file_path, index=False)
 
 
 def per_district_model_training_testing(district_name: str,
@@ -185,40 +223,47 @@ def per_district_model_training_testing(district_name: str,
 
     # Creating empty dataframes for the mean values of metrics for the current district's training and testing datasets
     metrics_features = ['mse_score', 'rmse_score', 'mae_score', 'mdae_score', 'evs_score', 'r2_score']
-    train_parameters_metrics = pd.DataFrame(columns=['model_names', 'parameters'] + metrics_features)
-    test_parameters_metrics = pd.DataFrame(columns=['model_names', 'parameters'] + metrics_features)
+    train_models_parameters_metrics = pd.DataFrame(columns=['model_names', 'parameters'] + metrics_features)
+    test_models_parameters_metrics = pd.DataFrame(columns=['model_names', 'parameters'] + metrics_features)
 
-    # Iterates across model_names for training and testing the models
+    # Iterates across model_names for training and testing the regression models
     for i in range(len(model_names)):
         parameters = retrieve_hyperparameters(model_names[i])
 
+        # Iterates across the parameters for optimizing the training of the regression models
+        for j in range(len(parameters)):
+            train_repeated_kfold_metrics = pd.DataFrame(columns=metrics_features)
+            test_repeated_kfold_metrics = pd.DataFrame(columns=metrics_features)
 
-    for i in range(len(parameters)):
-        train_repeated_kfold_metrics = pd.DataFrame(columns=metrics_features)
-        test_repeated_kfold_metrics = pd.DataFrame(columns=metrics_features)
-        for train_index, test_index in repeated_kfold.split(district_data):
-            train_district_data = district_data.iloc[train_index]
-            test_district_data = district_data.iloc[test_index]
-            train_district_data_input = np.array(train_district_data.drop(columns=['district', 'rainfall']))
-            train_district_data_target = np.array(train_district_data['rainfall'])
-            test_district_data_input = np.array(test_district_data.drop(columns=['district', 'rainfall']))
-            test_district_data_target = np.array(test_district_data['rainfall'])
-            if chosen_model_name == 'polynomial_regression':
-                train_district_data_input, test_district_data_input = polynomial_feature_transformation(
-                    train_district_data_input, test_district_data_input)
-            train_metrics, test_metrics = model_training_testing(train_district_data_input, train_district_data_target,
-                                                                 test_district_data_input, test_district_data_target,
-                                                                 chosen_model_name, parameters[i])
-            train_repeated_kfold_metrics = train_repeated_kfold_metrics.append(train_metrics, ignore_index=True)
-            test_repeated_kfold_metrics = test_repeated_kfold_metrics.append(test_metrics, ignore_index=True)
-        train_parameters_metrics = calculate_metrics_mean_repeated_kfold(train_parameters_metrics,
-                                                                         train_repeated_kfold_metrics, parameters[i])
-        test_parameters_metrics = calculate_metrics_mean_repeated_kfold(test_parameters_metrics,
-                                                                        test_repeated_kfold_metrics, parameters[i])
-    print(train_parameters_metrics.head())
+            # Iterates across the Repeated K-fold Cross Validation's data splits and repeats
+            for train_index, test_index in repeated_kfold.split(district_data):
 
+                # Based on the split index values, the training and testing datasets are created
+                train_district_data = district_data.iloc[train_index]
+                test_district_data = district_data.iloc[test_index]
 
+                # Splits district_data into input and target datasets
+                train_district_data_input, train_district_data_target = split_data_input_target(train_district_data)
+                test_district_data_input, test_district_data_target = split_data_input_target(test_district_data)
 
+                # Computes training and testing metrics for the current iteration
+                train_metrics, test_metrics = model_training_testing(train_district_data_input,
+                                                                     train_district_data_target,
+                                                                     test_district_data_input,
+                                                                     test_district_data_target,
+                                                                     model_names[i], parameters[j])
+
+            # Computes training and testing mean values of metrics for current regression model's hyperparameter
+            train_models_parameters_metrics = calculate_metrics_mean_repeated_kfold(train_models_parameters_metrics,
+                                                                                    train_repeated_kfold_metrics,
+                                                                                    model_names[i], parameters[j],
+                                                                                    metrics_features)
+            test_models_parameters_metrics = calculate_metrics_mean_repeated_kfold(test_models_parameters_metrics,
+                                                                                   test_repeated_kfold_metrics,
+                                                                                   model_names[i], parameters[j],
+                                                                                   metrics_features)
+
+    district_data_export('{}_{}'.format(district_name, 'training_metrics'))
 
 
 def district_model_training_testing(district_names: list,
