@@ -135,15 +135,64 @@ def calculate_metrics_mean_repeated_kfold(parameters_metrics: pd.DataFrame,
     return parameters_metrics
 
 
+def retrieve_hyperparameters(current_model_name: str):
+    """Based on the current_model_name return a list of hyperparameters used for optimizing the model (if necessary).
+
+        Args:
+            current_model_name: Name of the model currently expected to be trained
+
+        Returns:
+            None
+    """
+    # For polynomial_regression, the hyperparameter tuned is degrees.
+    if current_model_name == 'polynomial_regression':
+        parameters = [2, 3, 4, 5]
+
+    # For decision_tree_regression, the hyperparameter tuned is max_depth
+    elif current_model_name == 'decision_tree_regression':
+        parameters = [2, 3, 4, 5, 6, 7]
+
+    # For support_vector_regression, the hyperparameter tuned is kernel
+    elif current_model_name == 'support_vector_regression':
+        parameters = ['linear', 'poly', 'rbf', 'sigmoid']
+
+    # For multiple_linear_regression, none of the hyperparameters are tuned.
+    else:
+        parameters = [None]
+    return parameters
+
+
 def per_district_model_training_testing(district_name: str,
-                                        parameters: list,
-                                        chosen_model_name: str):
+                                        model_names: list):
+    """Performs regression model training and testing using Repeated K-fold Cross Validation, calculation of metrics for
+    every iteration and computation of mean of all the metrics for all the hyperparameters for every regression model
+    (if necessary).
+
+        Args:
+            district_name: Name of district in Tamil Nadu, India among the available 29 districts
+            model_names: List containing the names of the models used for developing the regression models
+
+        Returns:
+            None
+    """
     district_data = pd.read_csv('{}/{}'.format('../data/min_max_normalized_data', district_name))
+
+    # Created an object for the Repeated K-fold Cross Validation where the number of repeats and splits as 10
     repeated_kfold = RepeatedKFold(n_repeats=10, n_splits=10)
+
+    # Shuffle the imported data before splitting it using Repeated K-fold Cross Validation
     district_data = shuffle(district_data)
+
+    # Creating empty dataframes for the mean values of metrics for the current district's training and testing datasets
     metrics_features = ['mse_score', 'rmse_score', 'mae_score', 'mdae_score', 'evs_score', 'r2_score']
-    train_parameters_metrics = pd.DataFrame(columns=['parameters'] + metrics_features)
-    test_parameters_metrics = pd.DataFrame(columns=['parameters'] + metrics_features)
+    train_parameters_metrics = pd.DataFrame(columns=['model_names', 'parameters'] + metrics_features)
+    test_parameters_metrics = pd.DataFrame(columns=['model_names', 'parameters'] + metrics_features)
+
+    # Iterates across model_names for training and testing the models
+    for i in range(len(model_names)):
+        parameters = retrieve_hyperparameters(model_names[i])
+
+
     for i in range(len(parameters)):
         train_repeated_kfold_metrics = pd.DataFrame(columns=metrics_features)
         test_repeated_kfold_metrics = pd.DataFrame(columns=metrics_features)
@@ -169,14 +218,7 @@ def per_district_model_training_testing(district_name: str,
     print(train_parameters_metrics.head())
 
 
-def retrieve_hyperparameters(chosen_model_name: str):
-    if chosen_model_name == 'polynomial_regression':
-        parameters = [2, 3, 4, 5]
-    elif chosen_model_name == 'decision_tree_regression':
-        parameters = [2, 3, 4, 5, 6, 7]
-    else:
-        parameters = ['linear', 'poly', 'rbf', 'sigmoid']
-    return parameters
+
 
 
 def district_model_training_testing(district_names: list,
