@@ -110,11 +110,27 @@ def model_training_testing(train_district_data_input: np.ndarray,
 
 def calculate_metrics_mean_repeated_kfold(parameters_metrics: pd.DataFrame,
                                           repeated_kfold_metrics: pd.DataFrame,
-                                          parameter: int):
-    metrics_name = list(repeated_kfold_metrics.columns)
-    repeated_kfold_metrics_mean = {metrics_name[i]: np.mean(repeated_kfold_metrics[metrics_name[i]]) for i in range(
-        len(metrics_name))}
+                                          parameter: int,
+                                          metrics_features: list):
+    """Calculate the mean of the metrics computed in every iteration of Repeated K-fold Cross Validation
+
+        Args:
+            parameters_metrics: A dataframe containing the mean of all the metrics for all the hyperparameters
+            repeated_kfold_metrics: A dataframe containing the metrics for all the iterations in the Repeated K-fold
+                                    Cross Validation
+            parameter: Current hyperparameter used for optimizing the regression model
+            metrics_features: List containing the acronyms of the metrics used for evaluating the trained models
+
+        Returns:
+            An updated dataframe containing the mean of all the metrics for all the hyperparameters including the
+            current hyperparameter
+    """
+    # Calculates mean of all the metrics computed in every iteration of Repeated K-fold Cross Validation
+    repeated_kfold_metrics_mean = {metrics_features[i]: np.mean(repeated_kfold_metrics[metrics_features[i]]) for i in
+                                   range(len(metrics_features))}
     repeated_kfold_metrics_mean['parameters'] = parameter
+
+    # Append the current hyperparameter's mean of metrics to the parameters_metrics
     parameters_metrics = parameters_metrics.append(repeated_kfold_metrics_mean, ignore_index=True)
     return parameters_metrics
 
