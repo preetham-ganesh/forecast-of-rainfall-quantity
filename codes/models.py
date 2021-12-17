@@ -146,23 +146,23 @@ def retrieve_hyperparameters(current_model_name: str):
             current_model_name: Name of the model currently expected to be trained
 
         Returns:
-            None
+            A dictionary containing the hyperparameter name and the values that will be used to optimize the model
     """
     # For polynomial_regression, the hyperparameter tuned is degrees.
     if current_model_name == 'polynomial_regression':
-        parameters = [2, 3, 4, 5]
+        parameters = {'degree': [2, 3, 4, 5]}
 
     # For decision_tree_regression, the hyperparameter tuned is max_depth
     elif current_model_name == 'decision_tree_regression':
-        parameters = [2, 3, 4, 5, 6, 7]
+        parameters = {'max_depth': [2, 3, 4, 5, 6, 7]}
 
     # For support_vector_regression, the hyperparameter tuned is kernel
     elif current_model_name == 'support_vector_regression':
-        parameters = ['linear', 'poly', 'rbf', 'sigmoid']
+        parameters = {'kernel': ['linear', 'poly', 'rbf', 'sigmoid']}
 
     # For multiple_linear_regression, none of the hyperparameters are tuned.
     else:
-        parameters = ['None']
+        parameters = {'None': ['None']}
     return parameters
 
 
@@ -267,6 +267,14 @@ def per_district_model_training_testing(district_name: str,
                                                                                    test_repeated_kfold_metrics,
                                                                                    model_names[i], parameters[j],
                                                                                    metrics_features)
+
+            print()
+            if model_names[i] == 'decision_tree_regression':
+                print('district_name={}, model_name={}, max_depth={}'.format(district_name, model_names[i],
+                                                                             parameters[j]))
+            elif model_names[i] == 'support_vector_regression':
+                print('district_name={}, model_name={}, max_depth={}'.format(district_name, model_names[i],
+                                                                             parameters[j]))
 
     # Exports the training and testing metrics into CSV files
     district_results_export(column_name_processing(district_name), 'training_metrics', train_models_parameters_metrics)
