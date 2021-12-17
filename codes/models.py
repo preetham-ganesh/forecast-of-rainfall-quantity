@@ -18,13 +18,30 @@ import os
 import numpy as np
 from sklearn.utils import shuffle
 from data_preprocessing import column_name_processing
+from sklearn.preprocessing import PolynomialFeatures
 
 
 def polynomial_feature_transformation(train_district_data_input: pd.DataFrame,
                                       test_district_data_input: pd.DataFrame,
                                       parameter: str):
+    """Performs feature transformation on the input data, where the parameter (number of degrees) decides the number of
+    output features.
 
-    return 0, 0
+        Args:
+            train_district_data_input: Input training data for the district
+            test_district_data_input: Input testing data for the district
+            parameter: Number of degrees used for performing feature transformation
+
+        Returns:
+            A tuple containing Training and Testing input datasets
+    """
+    # Creates a scikit-learn object for the Polynomial features using the parameter (number of parameters)
+    polynomial_features = PolynomialFeatures(degree=int(parameter))
+
+    # Performs feature transformation on the Training and Testing input datasets
+    train_district_data_polynomial_input = polynomial_features.fit_transform(train_district_data_input)
+    test_district_data_polynomial_input = polynomial_features.fit_transform(test_district_data_input)
+    return train_district_data_polynomial_input, test_district_data_polynomial_input
 
 
 def rmse_score(actual_values: np.ndarray,
@@ -83,28 +100,29 @@ def model_training_testing(train_district_data_input: np.ndarray,
             A tuple containing metrics for the training and testing dataset computed using the currently trained model
     """
     # Based on the current_model_name the scikit-learn object is initialized using the hyperparameter (if necessary)
-    if current_model_name == 'polynomial_regression' or current_model_name == 'linear_regression':
+    if current_model_name == 'multiple_linear_regression':
         model = LinearRegression()
 
-        # if current_model_name is polynomial_regression then the training_input and testing_input should be transformed
-        # based on the hyperparameter which is the number of degrees
-        if current_model_name == 'polynomial_regression':
-            train_district_data_input, test_district_data_input = polynomial_feature_transformation(
-                train_district_data_input, test_district_data_input, parameter)
+    # if current_model_name is polynomial_regression then the training_input and testing_input should be transformed
+    # based on the hyperparameter which is the number of degrees
+    elif current_model_name == 'polynomial_regression':
+        model = LinearRegression()
+        train_district_data_input, test_district_data_input = polynomial_feature_transformation(
+            train_district_data_input, test_district_data_input, parameter)
 
     elif current_model_name == 'decision_tree_regression':
         model = DecisionTreeRegressor(max_depth=int(parameter))
     else:
-        model = SVR(kernel=int(parameter))
+        model = SVR(kernel=parameter)
 
-    # Train the object created for the model using the training input and target
+    # Trains the object created for the model using the training input and target
     model.fit(train_district_data_input, train_district_data_target)
 
-    # Using the trained model, predict the rainfall values for the training and testing inputs
+    # Using the trained model, predicts the rainfall values for the training and testing inputs
     train_district_data_predict = model.predict(train_district_data_input)
     test_district_data_predict = model.predict(test_district_data_input)
 
-    # Calculate the metrics for the predicted rainfall values for the training and testing inputs
+    # Calculates the metrics for the predicted rainfall values for the training and testing inputs
     train_metrics = calculate_metrics(train_district_data_target, train_district_data_predict)
     test_metrics = calculate_metrics(test_district_data_target, test_district_data_predict)
     return train_metrics, test_metrics
@@ -151,7 +169,7 @@ def retrieve_hyperparameters(current_model_name: str):
     """
     # For polynomial_regression, the hyperparameter tuned is degrees.
     if current_model_name == 'polynomial_regression':
-        parameters = {'degree': [2, 3, 4, 5]}
+        parameters = {'degree': [2, 3, 4]}
 
     # For decision_tree_regression, the hyperparameter tuned is max_depth
     elif current_model_name == 'decision_tree_regression':
@@ -233,7 +251,7 @@ def per_district_model_training_testing(district_name: str,
         parameters = retrieve_hyperparameters(model_names[i])
 
         # Iterates across the parameters for optimizing the training of the regression models
-        for j in range(len(parameters)):
+        for j in range(len(list(parameters.values())[0])):
             train_repeated_kfold_metrics = pd.DataFrame(columns=metrics_features)
             test_repeated_kfold_metrics = pd.DataFrame(columns=metrics_features)
 
@@ -270,14 +288,15 @@ def per_district_model_training_testing(district_name: str,
                                                                                    model_names[i],
                                                                                    list(parameters.values())[0][j],
                                                                                    metrics_features)
-
             print()
             if model_names[i] != 'multiple_linear_regression':
-                print('district={}, model={}, {}={} completed successfully'.format(district_name, model_names[i],
+                print('district={}, model={}, {}={} completed successfully'.format(column_name_processing(district_name),
+                                                                                   model_names[i],
                                                                                    list(parameters.keys())[0],
                                                                                    list(parameters.values())[0][j]))
             else:
-                print('district={}, model={} completed successfully'.format(district_name, model_names[i]))
+                print('district={}, model={} completed successfully'.format(column_name_processing(district_name),
+                                                                            model_names[i]))
 
     # Exports the training and testing metrics into CSV files
     district_results_export(column_name_processing(district_name), 'training_metrics', train_models_parameters_metrics)
@@ -287,8 +306,10 @@ def per_district_model_training_testing(district_name: str,
 def main():
     district_names = os.listdir('../data/min_max_normalized_data')
     district_names.sort()
-    model_names = ['decision_tree_regression']
+    model_names = ['multiple_linear_regression', 'polynomial_regression', 'decision_tree_regression',
+                   'support_vector_regression']
     per_district_model_training_testing(district_names[0], model_names)
+    print()
 
 
 if __name__ == '__main__':
