@@ -78,7 +78,7 @@ def model_training_testing(train_district_data_input: np.ndarray,
             parameter: Hyperparameter value for optimizing the regression model
 
         Returns:
-            List containing metrics for the training and testing dataset computed using the currently trained model
+            A tuple containing metrics for the training and testing dataset computed using the currently trained model
     """
     # Based on the current_model_name the scikit-learn object is initialized using the hyperparameter (if necessary)
     if current_model_name == 'polynomial_regression' or current_model_name == 'linear_regression':
@@ -105,7 +105,7 @@ def model_training_testing(train_district_data_input: np.ndarray,
     # Calculate the metrics for the predicted rainfall values for the training and testing inputs
     train_metrics = calculate_metrics(train_district_data_target, train_district_data_predict)
     test_metrics = calculate_metrics(test_district_data_target, test_district_data_predict)
-    return [train_metrics, test_metrics]
+    return train_metrics, test_metrics
 
 
 def calculate_metrics_mean_repeated_kfold(parameters_metrics: pd.DataFrame,
@@ -182,22 +182,22 @@ def split_data_input_target(district_data: pd.DataFrame):
 def district_results_export(district_name: str,
                             data_split: str,
                             metrics_dataframe: pd.DataFrame):
-    """Exports the metrics_dataframe into a CSV format to the mentioned data_version folder. If the folder does not
+    """Exports the metrics_dataframe into a CSV format to the mentioned data_split folder. If the folder does not
     exist, then the folder is created.
 
         Args:
             district_name: Name of district in Tamil Nadu, India among the available 29 districts
             data_split: Location where the metrics has to be exported
-            metrics_dataframe: Metrics dataframe
+            metrics_dataframe: A dataframe containing the mean of all the metrics for all the hyperparameters and models
 
         Returns:
             None
     """
-    directory_path = '{}/{}'.format('../data', data_version)
+    directory_path = '{}/{}'.format('../results/metrics', data_split)
     if not os.path.isdir(directory_path):
         os.mkdir(directory_path)
     file_path = '{}/{}.csv'.format(directory_path, district_name)
-    data.to_csv(file_path, index=False)
+    metrics_dataframe.to_csv(file_path, index=False)
 
 
 def per_district_model_training_testing(district_name: str,
@@ -250,14 +250,15 @@ def per_district_model_training_testing(district_name: str,
                 train_metrics, test_metrics = model_training_testing(train_district_data_input,
                                                                      train_district_data_target,
                                                                      test_district_data_input,
-                                                                     test_district_data_target,
-                                                                     model_names[i], parameters[j])
+                                                                     test_district_data_target, model_names[i],
+                                                                     parameters[j])
+
+                
 
             # Computes training and testing mean values of metrics for current regression model's hyperparameter
             train_models_parameters_metrics = calculate_metrics_mean_repeated_kfold(train_models_parameters_metrics,
-                                                                                    train_repeated_kfold_metrics,
-                                                                                    model_names[i], parameters[j],
-                                                                                    metrics_features)
+                                                                                    train_mean_metrics, model_names[i],
+                                                                                    parameters[j], metrics_features)
             test_models_parameters_metrics = calculate_metrics_mean_repeated_kfold(test_models_parameters_metrics,
                                                                                    test_repeated_kfold_metrics,
                                                                                    model_names[i], parameters[j],
