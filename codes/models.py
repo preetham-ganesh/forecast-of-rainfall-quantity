@@ -85,8 +85,7 @@ def model_training_testing(train_district_data_input: np.ndarray,
                            test_district_data_target: np.ndarray,
                            current_model_name: str,
                            parameter: str):
-    """Creates an object for the model using the input and performs training and testing of the models using the given
-    training and testing datasets.
+    """Creates an object for the model using the input and performs training and testing using the given datasets.
 
         Args:
             train_district_data_input: Input training data for the district
@@ -97,14 +96,14 @@ def model_training_testing(train_district_data_input: np.ndarray,
             parameter: Hyperparameter value for optimizing the regression model
 
         Returns:
-            A tuple containing metrics for the training and testing dataset computed using the currently trained model
+            A tuple containing metrics for the training and testing dataset computed using the currently trained model.
     """
-    # Based on the current_model_name the scikit-learn object is initialized using the hyperparameter (if necessary)
+    # Based on the current_model_name, the scikit-learn object is initialized using the hyperparameter (if necessary)
     if current_model_name == 'multiple_linear_regression':
         model = LinearRegression()
 
-    # if current_model_name is polynomial_regression then the training_input and testing_input should be transformed
-    # based on the hyperparameter which is the number of degrees
+    # if current_model_name is polynomial_regression, then the training_input and testing_input should be transformed
+    # based on the hyperparameter, which is the number of degrees.
     elif current_model_name == 'polynomial_regression':
         model = LinearRegression()
         train_district_data_input, test_district_data_input = polynomial_feature_transformation(
@@ -118,7 +117,7 @@ def model_training_testing(train_district_data_input: np.ndarray,
     # Trains the object created for the model using the training input and target
     model.fit(train_district_data_input, train_district_data_target)
 
-    # Using the trained model, predicts the rainfall values for the training and testing inputs
+    # Using the trained model predicts the rainfall values for the training and testing inputs
     train_district_data_predict = model.predict(train_district_data_input)
     test_district_data_predict = model.predict(test_district_data_input)
 
