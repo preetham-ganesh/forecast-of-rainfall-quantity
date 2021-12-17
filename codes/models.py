@@ -252,7 +252,7 @@ def per_district_model_training_testing(district_name: str,
                                                                      train_district_data_target,
                                                                      test_district_data_input,
                                                                      test_district_data_target, model_names[i],
-                                                                     parameters[j])
+                                                                     list(parameters.values())[0][j])
 
                 # Append training and testing metrics to Repeated K-fold dataframe
                 train_repeated_kfold_metrics = train_repeated_kfold_metrics.append(train_metrics, ignore_index=True)
@@ -261,20 +261,22 @@ def per_district_model_training_testing(district_name: str,
             # Computes training and testing mean values of metrics for current regression model's hyperparameter
             train_models_parameters_metrics = calculate_metrics_mean_repeated_kfold(train_models_parameters_metrics,
                                                                                     train_repeated_kfold_metrics,
-                                                                                    model_names[i], parameters[j],
+                                                                                    model_names[i],
+                                                                                    list(parameters.values())[0][j],
                                                                                     metrics_features)
             test_models_parameters_metrics = calculate_metrics_mean_repeated_kfold(test_models_parameters_metrics,
                                                                                    test_repeated_kfold_metrics,
-                                                                                   model_names[i], parameters[j],
+                                                                                   model_names[i],
+                                                                                   list(parameters.values())[0][j],
                                                                                    metrics_features)
 
             print()
-            if model_names[i] == 'decision_tree_regression':
-                print('district_name={}, model_name={}, max_depth={}'.format(district_name, model_names[i],
-                                                                             parameters[j]))
-            elif model_names[i] == 'support_vector_regression':
-                print('district_name={}, model_name={}, max_depth={}'.format(district_name, model_names[i],
-                                                                             parameters[j]))
+            if model_names[i] != 'multiple_linear_regression':
+                print('district={}, model={}, {}={} completed successfully'.format(district_name, model_names[i],
+                                                                                   list(parameters.keys())[0],
+                                                                                   list(parameters.values())[0][j]))
+            else:
+                print('district={}, model={} completed successfully'.format(district_name, model_names[i]))
 
     # Exports the training and testing metrics into CSV files
     district_results_export(column_name_processing(district_name), 'training_metrics', train_models_parameters_metrics)
