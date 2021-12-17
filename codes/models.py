@@ -23,6 +23,7 @@ from data_preprocessing import column_name_processing
 def polynomial_feature_transformation(train_district_data_input: pd.DataFrame,
                                       test_district_data_input: pd.DataFrame,
                                       parameter: str):
+
     return 0, 0
 
 
@@ -129,8 +130,8 @@ def calculate_metrics_mean_repeated_kfold(parameters_metrics: pd.DataFrame,
             current hyperparameter
     """
     # Calculates mean of all the metrics computed in every iteration of Repeated K-fold Cross Validation
-    repeated_kfold_metrics_mean = {metrics_features[i]: np.mean(repeated_kfold_metrics[metrics_features[i]]) for i in
-                                   range(len(metrics_features))}
+    repeated_kfold_metrics_mean = {metrics_features[i]: round(float(
+        np.mean(repeated_kfold_metrics[metrics_features[i]])), 6) for i in range(len(metrics_features))}
     repeated_kfold_metrics_mean['parameters'] = parameter
     repeated_kfold_metrics_mean['model_names'] = current_model_name
 
