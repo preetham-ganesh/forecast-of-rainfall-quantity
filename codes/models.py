@@ -17,6 +17,7 @@ from sklearn.model_selection import RepeatedKFold
 import os
 import numpy as np
 from sklearn.utils import shuffle
+from data_preprocessing import column_name_processing
 
 
 def polynomial_feature_transformation(train_district_data_input: pd.DataFrame,
@@ -193,7 +194,7 @@ def district_results_export(district_name: str,
         Returns:
             None
     """
-    directory_path = '{}/{}'.format('../results/metrics', data_split)
+    directory_path = '{}/{}'.format('../results/', data_split)
     if not os.path.isdir(directory_path):
         os.mkdir(directory_path)
     file_path = '{}/{}.csv'.format(directory_path, district_name)
@@ -254,8 +255,8 @@ def per_district_model_training_testing(district_name: str,
                                                                      parameters[j])
 
                 # Append training and testing metrics to Repeated K-fold dataframe
-                train_repeated_kfold_metrics = train_repeated_kfold_metrics.append(train_metrics)
-                test_repeated_kfold_metrics = test_repeated_kfold_metrics.append(test_metrics)
+                train_repeated_kfold_metrics = train_repeated_kfold_metrics.append(train_metrics, ignore_index=True)
+                test_repeated_kfold_metrics = test_repeated_kfold_metrics.append(test_metrics, ignore_index=True)
 
             # Computes training and testing mean values of metrics for current regression model's hyperparameter
             train_models_parameters_metrics = calculate_metrics_mean_repeated_kfold(train_models_parameters_metrics,
@@ -268,32 +269,15 @@ def per_district_model_training_testing(district_name: str,
                                                                                    metrics_features)
 
     # Exports the training and testing metrics into CSV files
-    district_results_export(district_name, 'training_metrics', train_models_parameters_metrics)
-    district_results_export(district_name, 'testing_metrics', test_models_parameters_metrics)
-
-
-def district_model_training_testing(district_names: list,
-                                    chosen_model_name: str):
-    parameters = retrieve_hyperparameters(chosen_model_name)
-    per_district_model_training_testing(district_names[0], parameters, chosen_model_name)
-
-
-def choose_model():
-    print()
-    print('Choose the model to be trained:')
-    model_names = ['polynomial_regression', 'decision_tree_regression', 'support_vector_regression']
-    for i in range(len(model_names)):
-        print('{}. {}'.format(str(i), model_names[i]))
-    print()
-    chosen_model_number = input()
-    return model_names[int(chosen_model_number)]
+    district_results_export(column_name_processing(district_name), 'training_metrics', train_models_parameters_metrics)
+    district_results_export(column_name_processing(district_name), 'testing_metrics', test_models_parameters_metrics)
 
 
 def main():
     district_names = os.listdir('../data/min_max_normalized_data')
     district_names.sort()
-    chosen_model_name = choose_model()
-    district_model_training_testing(district_names, chosen_model_name)
+    model_names = ['decision_tree_regression']
+    per_district_model_training_testing(district_names[0], model_names)
 
 
 if __name__ == '__main__':
