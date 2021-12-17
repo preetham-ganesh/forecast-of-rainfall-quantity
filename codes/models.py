@@ -191,7 +191,7 @@ def split_data_input_target(district_data: pd.DataFrame):
             district_data: Training / Testing dataset used to split / filter certain columns
 
         Returns:
-            A tuple containing 2 numpy ndarrays containing the input and target datasets
+            A tuple containing 2 numpy ndarrays for the input and target datasets
     """
     district_data_input = district_data.drop(columns=['district', 'rainfall'])
     district_data_target = district_data['rainfall']
@@ -287,7 +287,6 @@ def per_district_model_training_testing(district_name: str,
                                                                                    model_names[i],
                                                                                    list(parameters.values())[0][j],
                                                                                    metrics_features)
-            print()
             if model_names[i] != 'multiple_linear_regression':
                 print('district={}, model={}, {}={} completed successfully'.format(column_name_processing(district_name),
                                                                                    model_names[i],
@@ -296,6 +295,7 @@ def per_district_model_training_testing(district_name: str,
             else:
                 print('district={}, model={} completed successfully'.format(column_name_processing(district_name),
                                                                             model_names[i]))
+        print()
 
     # Exports the training and testing metrics into CSV files
     district_results_export(column_name_processing(district_name), 'training_metrics', train_models_parameters_metrics)
@@ -307,8 +307,10 @@ def main():
     district_names.sort()
     model_names = ['multiple_linear_regression', 'polynomial_regression', 'decision_tree_regression',
                    'support_vector_regression']
-    per_district_model_training_testing(district_names[0], model_names)
     print()
+    for i in range(len(district_names)):
+        per_district_model_training_testing(district_names[i], model_names)
+        print()
 
 
 if __name__ == '__main__':
