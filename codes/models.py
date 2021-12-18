@@ -168,7 +168,7 @@ def retrieve_hyperparameters(current_model_name: str):
     """
     # For polynomial_regression, the hyperparameter tuned is degrees.
     if current_model_name == 'polynomial_regression':
-        parameters = {'degree': [2, 3, 4]}
+        parameters = {'degree': [2, 3, 4, 5]}
 
     # For decision_tree_regression, the hyperparameter tuned is max_depth
     elif current_model_name == 'decision_tree_regression':
@@ -193,7 +193,14 @@ def split_data_input_target(district_data: pd.DataFrame):
         Returns:
             A tuple containing 2 numpy ndarrays for the input and target datasets
     """
-    district_data_input = district_data.drop(columns=['district', 'rainfall'])
+    # The clustering-based files have a column for district names that will not be there in other files. If the column
+    # is there in the dataframe, then both rainfall and district will be filtered; else, only the rainfall column will
+    # be filtered for the input dataframes.
+    if 'district' in list(district_data.columns):
+        columns_removed = ['district', 'rainfall']
+    else:
+        columns_removed = ['rainfall']
+    district_data_input = district_data.drop(columns=columns_removed)
     district_data_target = district_data['rainfall']
     return np.array(district_data_input), np.array(district_data_target)
 
@@ -304,7 +311,6 @@ def per_district_model_training_testing(district_name: str,
 
 def main():
     district_names = os.listdir('../data/min_max_normalized_data')
-    district_names.sort()
     model_names = ['multiple_linear_regression', 'polynomial_regression', 'decision_tree_regression',
                    'support_vector_regression']
     print()
