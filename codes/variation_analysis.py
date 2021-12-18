@@ -20,14 +20,18 @@ def compute_cluster_monthly_median(clusters: list,
             cluster_filtered_data = cluster_data.filter(items=[k + j for k in range(0, len(cluster_data), len(months))],
                                                         axis=0)
             cluster_monthly_median_data[clusters[i]].append(np.median(list(cluster_filtered_data['rainfall'])))
-    cluster_monthly_median_dataframe = pd.DataFrame(cluster_monthly_median_data, columns=clusters)
+    cluster_monthly_median_data['months'] = months
+    cluster_monthly_median_dataframe = pd.DataFrame(cluster_monthly_median_data, columns=['months'] + clusters)
     return cluster_monthly_median_dataframe
+
+
+def plot_preprocessing(cluster_)
 
 
 def main():
     clusters = ['cluster_{}'.format(str(i)) for i in range(0, 6)]
     months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
-    compute_cluster_monthly_median(clusters, months)
+    cluster_monthly_median_dataframe = compute_cluster_monthly_median(clusters, months)
 
 
 
