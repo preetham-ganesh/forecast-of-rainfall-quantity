@@ -51,14 +51,38 @@ def compute_cluster_monthly_median(clusters: list,
 def plot_preprocessing(cluster_month_median_dataframe: pd.DataFrame,
                        clusters: list,
                        months: list):
+    """Performs data preprocessing on the cluster rainfall monthly median data by smoothening the median data. The
+    values are smoothened by converting them into quadratic function values, and the mean is computed for those values.
+
+
+        Args:
+            cluster_month_median_dataframe: A dataframe containing rainfall monthly median for all the clusters.
+            clusters: A list containing the cluster names used for files in the previous codes.
+            months: A list containing the names of months in a year.
+
+        Returns:
+            A tuple containing two dictionaries and a list, where the first dictionary contains the smoothened median
+            data, the second dictionary contains the mean values for the smoothened median data, and the list contains
+            the evenly spaced numbers over the index of months.
+    """
     months_numbers = list(range(len(months)))
+
+    # Evenly spaces 500 numbers between minimum and maximum of months indexes.
     months_numbers_linspace = np.linspace(min(months_numbers), max(months_numbers), 500)
     cluster_smooth_values = {}
     cluster_smooth_values_mean = {}
+
+    # Iterates over clusters to smoothen median data and computes the mean of the smoothened data.
     for i in range(len(clusters)):
+
+        # Creates an object for smoothing function, which converts the median into a quadratic function.
         smoothing_function_current_cluster = interp1d(months_numbers, list(cluster_month_median_dataframe[clusters[i]]),
                                                       kind='quadratic')
+
+        # Computes the smoothened values using the object for the quadratic function.
         cluster_smooth_values[clusters[i]] = smoothing_function_current_cluster(months_numbers_linspace)
+
+        # Computes the mean values for smoothened values.
         cluster_smooth_values_mean[clusters[i]] = [np.mean(cluster_smooth_values[clusters[i]]) for _ in
                                                    range(len(cluster_smooth_values[clusters[i]]))]
     return cluster_smooth_values, cluster_smooth_values_mean, months_numbers_linspace
