@@ -39,26 +39,49 @@ def plot_preprocessing(cluster_month_median_dataframe: pd.DataFrame,
         smoothing_function_current_cluster = interp1d(months_numbers, list(cluster_month_median_dataframe[clusters[i]]),
                                                       kind='quadratic')
         cluster_smooth_values[clusters[i]] = smoothing_function_current_cluster(months_numbers_linspace)
-        cluster_smooth_values_mean[clusters[i]] = [np.mean(cluster_smooth_values[clusters[i]]) for i in
+        cluster_smooth_values_mean[clusters[i]] = [np.mean(cluster_smooth_values[clusters[i]]) for _ in
                                                    range(len(cluster_smooth_values[clusters[i]]))]
-    return cluster_smooth_values, cluster_smooth_values_mean
+    return cluster_smooth_values, cluster_smooth_values_mean, months_numbers_linspace
 
 
 def generate_plot(cluster_smooth_values: dict,
-                  cluster_smooth_values_mean: dict):
-    font = {'family': 'Times New Roman',
-            'size': 28}
+                  cluster_smooth_values_mean: dict,
+                  months_numbers_linspace: np.ndarray,
+                  clusters: list,
+                  cluster_groups: list,
+                  months: list,
+                  cluster_colors: list,
+                  plot_name: str):
+    font = {'size': 28}
     plt.rc('font', **font)
     figure(num=None, figsize=(20, 10))
-
+    for i in cluster_groups:
+        plt.plot(months_numbers_linspace, cluster_smooth_values[clusters[i]], color=cluster_colors[i],
+                 label='cluster_{}'.format(str(i)), alpha=0.4, linewidth=3)
+        plt.plot(months_numbers_linspace, cluster_smooth_values_mean[clusters[i]], '--',
+                 color=cluster_colors[i], linewidth=3)
+    plt.xlabel('months')
+    plt.ylabel('normalized_rainfall')
+    plt.legend(loc='upper left')
+    plt.xticks(range(0, len(months)), months)
+    plt.grid(color='black', linestyle='-.', linewidth=2, alpha=0.3)
+    plt.savefig('../results/variation_analysis_{}.png'.format(plot_name))
+    plt.show()
 
 
 def main():
     clusters = ['cluster_{}'.format(str(i)) for i in range(0, 6)]
+    cluster_colors = ['red', 'orange', 'green', 'blue', 'magenta', 'black']
     months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+    cluster_group_1 = [0, 2, 3]
+    cluster_group_2 = [1, 4, 5]
     cluster_monthly_median_dataframe = compute_cluster_monthly_median(clusters, months)
-    plot_preprocessing(cluster_monthly_median_dataframe, clusters, months)
-
+    cluster_smooth_values, cluster_smooth_values_mean, months_numbers_linspace = plot_preprocessing(
+        cluster_monthly_median_dataframe, clusters, months)
+    generate_plot(cluster_smooth_values, cluster_smooth_values_mean, months_numbers_linspace, clusters,
+                  cluster_group_1, months, cluster_colors, 'cluster_group_1')
+    generate_plot(cluster_smooth_values, cluster_smooth_values_mean, months_numbers_linspace, clusters,
+                  cluster_group_2, months, cluster_colors, 'cluster_group_2')
 
 
 if __name__ == '__main__':
