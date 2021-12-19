@@ -96,14 +96,39 @@ def generate_plot(cluster_smooth_values: dict,
                   months: list,
                   cluster_colors: list,
                   plot_name: str):
+    """Generates plot for the cluster groups using cluster smooth values and their mean values.
+
+        Args:
+            cluster_smooth_values: A dictionary containing the smoothened median data for each cluster.
+            cluster_smooth_values_mean: A dictionary containing the mean values for the smoothened median data for each
+                                        cluster.
+            months_numbers_linspace: A list containing the evenly spaced numbers over the index of months.
+            clusters: A list containing the cluster names used for files in the previous codes.
+            cluster_groups: A list containing the cluster numbers for which the plot has to be generated.
+            months: A list containing the names of months in a year.
+            cluster_colors: A list containing the colors used for representing each cluster in the generated plot.
+            plot_name: The name by which the generated plot should be saved in the system.
+
+        Returns:
+            None
+    """
+    # Specifications used to generate the plot, i.e., font size and size of the plot.
     font = {'size': 28}
     plt.rc('font', **font)
     figure(num=None, figsize=(20, 10))
+
+    # Iterates across the cluster_groups to generate the plot for specific clusters.
     for i in cluster_groups:
+
+        # Generates the plot for the smoothened values from each cluster.
         plt.plot(months_numbers_linspace, cluster_smooth_values[clusters[i]], color=cluster_colors[i],
                  label='cluster_{}'.format(str(i)), alpha=0.4, linewidth=3)
+
+        # Generates the plot for the mean of the smoothened values from each cluster.
         plt.plot(months_numbers_linspace, cluster_smooth_values_mean[clusters[i]], '--',
                  color=cluster_colors[i], linewidth=3)
+
+    # Generates the plot for the months vs normalized rainfall.
     plt.xlabel('months')
     plt.ylabel('normalized_rainfall')
     plt.legend(loc='upper left')
