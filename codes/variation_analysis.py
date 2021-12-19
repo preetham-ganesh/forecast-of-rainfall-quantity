@@ -13,17 +13,37 @@ from matplotlib.pyplot import figure
 
 def compute_cluster_monthly_median(clusters: list,
                                    months: list):
+    """Computes median for all the clusters based on months, where the median would be computed for the rainfall
+    feature.
+
+        Args:
+            clusters: A list containing the cluster names used for files in the previous codes.
+            months: A list containing the names of months in a year.
+
+        Returns:
+            A dataframe containing rainfall monthly median for all the clusters.
+    """
     directory_path = '../data/min_max_normalized_data'
     cluster_monthly_median_data = {}
+
+    # Iterates across the list of the clusters for computing the monthly medians.
     for i in range(len(clusters)):
         cluster_monthly_median_data[clusters[i]] = []
         file_path = '{}/{}.csv'.format(directory_path, clusters[i])
         cluster_data = pd.read_csv(file_path)
+
+        # Iterates across the months for filtering the data and computing the median.
         for j in range(len(months)):
+
+            # Filters the cluster data based on the index from the iteration of months
             cluster_filtered_data = cluster_data.filter(items=[k + j for k in range(0, len(cluster_data), len(months))],
                                                         axis=0)
+
+            # Computes median for rainfall feature data and saves to the dictionary.
             cluster_monthly_median_data[clusters[i]].append(np.median(list(cluster_filtered_data['rainfall'])))
     cluster_monthly_median_data['months'] = months
+
+    # Converts a dictionary to a dataframe.
     cluster_monthly_median_dataframe = pd.DataFrame(cluster_monthly_median_data, columns=['months'] + clusters)
     return cluster_monthly_median_dataframe
 
