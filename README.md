@@ -53,7 +53,7 @@ python3 variation_analysis.py
 
 ## Support
 
-For any queries regarding the repository contact 'preetham.ganesh2015@gmail.com' or 'harshavardhini2019@gmail.com'.
+For any queries regarding the repository contact preetham.ganesh2015@gmail.com or harshavardhini2019@gmail.com.
 
 ## License
 
