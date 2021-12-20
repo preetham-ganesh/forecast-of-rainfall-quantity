@@ -21,6 +21,12 @@ conda activate forq_env
 pip install -r requirements.txt
 ```
 
+## Data Preprocessing
+
+```bash
+python3 data_preprocessing.py
+```
+
 ## License
 [GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
 
