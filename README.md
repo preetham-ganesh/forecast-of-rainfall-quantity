@@ -25,6 +25,20 @@ pip install -r requirements.txt
 
 ```bash
 python3 data_preprocessing.py
+python3 elbow_method.py
+python3 clustering_and_data_splitting.py
+```
+
+## Model Training and Testing
+
+```bash
+python3 models.py
+```
+
+## Variation Analysis
+
+```bash
+python3 variation_analysis.py
 ```
 
 ## License
