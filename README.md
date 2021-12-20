@@ -11,13 +11,13 @@ Paper link: [[IEEE]](https://ieeexplore.ieee.org/document/8960026)
 
 ## Description
 
-- It is an application for predicting rainfall in districts belonging to Tamil Nadu, India, using regression methods which captures sudden fluctuations.
-- The project aims at developing three models which predict monthly rainfall for all districts in Tamil Nadu, India and also drawing a district-wise comparison among them to find the best model for prediction.
+- It is an application for predicting rainfall in Tamil Nadu, India, using regression methods that capture sudden fluctuations.
+- The project aims to develop three models that predict monthly rainfall for all districts in Tamil Nadu, India, and draw a district-wise comparison among them to find the best prediction model.
 - The models developed are as follows:
 	- **District-Specific Model**:
-		- It trains on data from a particular district
+		- It trains on data from a particular district.
 	- **Cluster-Based Model**:
-		- It groups districts based on the climatic conditions and trains on data from a particular cluster
+		- It groups districts based on climatic conditions and trains on data from a particular cluster.
 	- **Generic-Regression Model**:
 		- It trains on combined data from all the districts in Tamil Nadu, India.
 - The project also aims at finding the monthly variation of rainfall across geographical regions.
@@ -51,7 +51,12 @@ python3 models.py
 python3 variation_analysis.py
 ```
 
+## Support
+
+For any queries regarding the repository contact 'preetham.ganesh2015@gmail.com' or 'harshavardhini2019@gmail.com'.
+
 ## License
+
 [GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
 
 ## Citation
