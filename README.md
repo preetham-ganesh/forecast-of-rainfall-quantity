@@ -7,6 +7,7 @@
 ## Contents
 
 - [Setup](https://github.com/preetham-ganesh/forecast-of-rainfall-quantity#setup)
+- [Data Preprocessing](https://github.com/preetham-ganesh/forecast-of-rainfall-quantity#data-preprocessing)
 
 ## Setup
 
