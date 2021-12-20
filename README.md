@@ -4,6 +4,10 @@
 
 [[IEEE]](https://ieeexplore.ieee.org/document/8960026), [[PDF]](https://preetham-ganesh.github.io/website/documents/forecast_rainfall.pdf)
 
+## Contents
+
+- [Setup](https://github.com/preetham-ganesh/forecast-of-rainfall-quantity#setup)
+
 ## Setup
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install requirements
