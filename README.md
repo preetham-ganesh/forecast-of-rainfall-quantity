@@ -6,8 +6,13 @@ Paper link: [[IEEE]](https://ieeexplore.ieee.org/document/8960026)
 
 ## Contents
 
-- [Setup](https://github.com/preetham-ganesh/forecast-of-rainfall-quantity#setup)
-- [Data Preprocessing](https://github.com/preetham-ganesh/forecast-of-rainfall-quantity#data-preprocessing)
+- [Description](https://github.com/preetham-ganesh/forecast-of-rainfall-quantity#description)
+- [Usage](https://github.com/preetham-ganesh/forecast-of-rainfall-quantity#usage)
+	- [Requirement Installation](https://github.com/preetham-ganesh/forecast-of-rainfall-quantity#requirement-installment)
+	- [File Execution](https://github.com/preetham-ganesh/forecast-of-rainfall-quantity#file-execution)
+- [Support](https://github.com/preetham-ganesh/forecast-of-rainfall-quantity#support)
+- [License](https://github.com/preetham-ganesh/forecast-of-rainfall-quantity#license)
+- [Citation](https://github.com/preetham-ganesh/forecast-of-rainfall-quantity#citation)
 
 ## Description
 
@@ -21,6 +26,10 @@ Paper link: [[IEEE]](https://ieeexplore.ieee.org/document/8960026)
 	- **Generic-Regression Model**:
 		- It trains on combined data from all the districts in Tamil Nadu, India.
 - The project also aims at finding the monthly variation of rainfall across geographical regions.
+
+## Dataset
+
+The data was downloaded from India Water Portal - Met Data Repository [[Link]](https://www.indiawaterportal.org/met_data). The data used in this project was downloaded in Jun 2018. 
 
 ## Usage
 
@@ -53,7 +62,7 @@ python3 variation_analysis.py
 
 ## Support
 
-For any queries regarding the repository contact preetham.ganesh2015@gmail.com or harshavardhini2019@gmail.com.
+For any queries regarding the repository contact 'preetham.ganesh2015@gmail.com' or 'harshavardhini2019@gmail.com'.
 
 ## License
 
