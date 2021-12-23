@@ -61,6 +61,10 @@ python3 models.py
 python3 variation_analysis.py
 ```
 
+## Future Work
+
+An extended version of the work done in this paper was published in 'Estimation of Rainfall Quantity using Hybrid Ensemble Regression' which can be accessed in [[Link]](https://ieeexplore.ieee.org/document/8986217). In addition, the code files used for developing the models in the above paper can be accessed in [[Link]](https://github.com/preetham-ganesh/estimation-of-rainfall-quantity).
+
 ## Support
 
 For any queries regarding the repository contact 'preetham.ganesh2015@gmail.com' or 'harshavardhini2019@gmail.com'.
