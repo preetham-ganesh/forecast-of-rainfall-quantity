@@ -1,6 +1,6 @@
-# authors_name = 'Preetham Ganesh, Harsha Vardhini Vasu'
+# authors_name = 'Preetham Ganesh, Harsha Vardhini Vasu, Dayanand Vinod'
 # project_title = 'Forecast of Rainfall Quantity and its Variation using Environmental Features'
-# email = 'preetham.ganesh2015@gmail.com, harshavardhini2019@gmail.com'
+# email = 'preetham.ganesh2015@gmail.com, harshavardhini2019@gmail.com, v_dayanand@cb.amrita.edu'
 # doi = 'https://ieeexplore.ieee.org/document/8960026'
 
 

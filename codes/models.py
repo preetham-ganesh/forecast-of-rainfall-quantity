@@ -1,6 +1,6 @@
-# authors_name = 'Preetham Ganesh, Harsha Vardhini Vasu'
+# authors_name = 'Preetham Ganesh, Harsha Vardhini Vasu, Dayanand Vinod'
 # project_title = 'Forecast of Rainfall Quantity and its Variation using Environmental Features'
-# email = 'preetham.ganesh2015@gmail.com, harshavardhini2019@gmail.com'
+# email = 'preetham.ganesh2015@gmail.com, harshavardhini2019@gmail.com, v_dayanand@cb.amrita.edu'
 # doi = 'https://ieeexplore.ieee.org/document/8960026'
 
 
@@ -38,7 +38,7 @@ def polynomial_feature_transformation(train_district_data_input: pd.DataFrame,
     # Creates a scikit-learn object for the Polynomial features using the parameter (number of parameters)
     polynomial_features = PolynomialFeatures(degree=int(parameter))
 
-    # Performs feature transformation on the Training and Testing input datasets
+    # Performs feature transformation on the Training and Testing input datasets.
     train_district_data_polynomial_input = polynomial_features.fit_transform(train_district_data_input)
     test_district_data_polynomial_input = polynomial_features.fit_transform(test_district_data_input)
     return train_district_data_polynomial_input, test_district_data_polynomial_input
